@@ -1,0 +1,418 @@
+DB in postgreSQL 9.5
+NAME- SURESH KUMAR PRAJAPAT
+Git Hub Link Of This Assignment https://github.com/sureshkpiitk/VideoPlateform.git
+
+tables Detail
+1. authentication_user
+                              Table "public.authentication_user"
+----------------------------------------------------------------------------------------------
+    Column     |           Type           | Modifiers | Storage  | Stats target | Description 
+---------------+--------------------------+-----------+----------+--------------+-------------
+ created_on    | timestamp with time zone | not null  | plain    |              | 
+ id            | uuid                     | not null  | plain    |              | 
+ first_name    | character varying(32)    | not null  | extended |              | 
+ last_name     | character varying(32)    | not null  | extended |              | 
+ email         | character varying(255)   | not null  | extended |              | 
+ mobile        | character varying(64)    |           | extended |              | 
+ modified_on   | timestamp with time zone | not null  | plain    |              | 
+ gender        | character varying(2)     |           | extended |              | 
+ date_of_birth | date                     |           | plain    |              | 
+ is_active     | boolean                  | not null  | plain    |              | 
+ is_deleted    | boolean                  | not null  | plain    |              | 
+ deleted_on    | timestamp with time zone |           | plain    |              | 
+ deleted_by_id | uuid                     |           | plain    |              | 
+Indexes:
+    "authentication_user_pkey" PRIMARY KEY, btree (id)
+    "authentication_user_email_key" UNIQUE CONSTRAINT, btree (email)
+    "authentication_user_email_2220eff5_like" btree (email varchar_pattern_ops)
+    "authentication_user_mobile_de59b2e6" btree (mobile)
+    "authentication_user_mobile_de59b2e6_like" btree (mobile varchar_pattern_ops)
+Foreign-key constraints:
+    "authentication_user_deleted_by_id_bf09dbde_fk_authentic" FOREIGN KEY (deleted_by_id) REFERENCES authentication_user(id) DEFERRABLE INITIALLY DEFERRED
+Referenced by:
+    TABLE "authentication_user" CONSTRAINT "authentication_user_deleted_by_id_bf09dbde_fk_authentic" FOREIGN KEY (deleted_by_id) REFERENCES authentication_user(id) DEFERRABLE INITIALLY DEFERRED
+    TABLE "video_playlist" CONSTRAINT "video_playlist_created_by_id_6d366335_fk_authentication_user_id" FOREIGN KEY (created_by_id) REFERENCES authentication_user(id) DEFERRABLE INITIALLY DEFERRED
+    TABLE "video_video" CONSTRAINT "video_video_deleted_by_id_a16b02fa_fk_authentication_user_id" FOREIGN KEY (deleted_by_id) REFERENCES authentication_user(id) DEFERRABLE INITIALLY DEFERRED
+    TABLE "video_video" CONSTRAINT "video_video_uploaded_by_id_c625d890_fk_authentication_user_id" FOREIGN KEY (uploaded_by_id) REFERENCES authentication_user(id) DEFERRABLE INITIALLY DEFERRED
+    TABLE "view_view" CONSTRAINT "view_view_user_id_02e716c6_fk_authentication_user_id" FOREIGN KEY (user_id) REFERENCES authentication_user(id) DEFERRABLE INITIALLY DEFERRED
+
+=================================================================================================================================
+
+
+2. video_video
+
+                                   Table "public.video_video"
+----------------------------------------------------------------------------------------------
+     Column     |           Type           | Modifiers | Storage  | Stats target | Description 
+----------------+--------------------------+-----------+----------+--------------+-------------
+ created_on     | timestamp with time zone | not null  | plain    |              | 
+ id             | uuid                     | not null  | plain    |              | 
+ title          | character varying(255)   | not null  | extended |              | 
+ modified_on    | timestamp with time zone | not null  | plain    |              | 
+ duration       | interval                 | not null  | plain    |              | 
+ likes          | integer                  | not null  | plain    |              | 
+ dislike        | integer                  | not null  | plain    |              | 
+ subscribed     | integer                  | not null  | plain    |              | 
+ deleted_on     | timestamp with time zone |           | plain    |              | 
+ video_played   | integer                  | not null  | plain    |              | 
+ deleted_by_id  | uuid                     |           | plain    |              | 
+ uploaded_by_id | uuid                     | not null  | plain    |              | 
+ video          | character varying(100)   | not null  | extended |              | 
+Indexes:
+    "video_video_pkey" PRIMARY KEY, btree (id)
+    "video_video_uploaded_by_id_c625d890" btree (uploaded_by_id)
+Check constraints:
+    "video_video_dislike_check" CHECK (dislike >= 0)
+    "video_video_likes_check" CHECK (likes >= 0)
+    "video_video_subscribed_check" CHECK (subscribed >= 0)
+    "video_video_video_played_check" CHECK (video_played >= 0)
+Foreign-key constraints:
+    "video_video_deleted_by_id_a16b02fa_fk_authentication_user_id" FOREIGN KEY (deleted_by_id) REFERENCES authentication_user(id) DEFERRABLE INITIALLY DEFERRED
+    "video_video_uploaded_by_id_c625d890_fk_authentication_user_id" FOREIGN KEY (uploaded_by_id) REFERENCES authentication_user(id) DEFERRABLE INITIALLY DEFERRED
+Referenced by:
+    TABLE "video_playlist_video" CONSTRAINT "video_playlist_video_video_id_f2656b12_fk_video_video_id" FOREIGN KEY (video_id) REFERENCES video_video(id) DEFERRABLE INITIALLY DEFERRED
+    TABLE "video_video_type" CONSTRAINT "video_video_type_video_id_22c72fdf_fk_video_video_id" FOREIGN KEY (video_id) REFERENCES video_video(id) DEFERRABLE INITIALLY DEFERRED
+    TABLE "view_view" CONSTRAINT "view_view_video_id_7bc9a696_fk_video_video_id" FOREIGN KEY (video_id) REFERENCES video_video(id) DEFERRABLE INITIALLY DEFERRED
+
+
+========================================================================================================================================
+
+
+3.video_playlist
+
+                             Table "public.video_playlist"
+---------------------------------------------------------------------------------------------
+    Column     |           Type           | Modifiers | Storage | Stats target | Description 
+---------------+--------------------------+-----------+---------+--------------+-------------
+ created_on    | timestamp with time zone | not null  | plain   |              | 
+ id            | uuid                     | not null  | plain   |              | 
+ modified_on   | timestamp with time zone | not null  | plain   |              | 
+ created_by_id | uuid                     |           | plain   |              | 
+Indexes:
+    "video_playlist_pkey" PRIMARY KEY, btree (id)
+    "video_playlist_created_by_id_6d366335" btree (created_by_id)
+Foreign-key constraints:
+    "video_playlist_created_by_id_6d366335_fk_authentication_user_id" FOREIGN KEY (created_by_id) REFERENCES authentication_user(id) DEFERRABLE INITIALLY DEFERRED
+Referenced by:
+    TABLE "video_playlist_video" CONSTRAINT "video_playlist_video_playlist_id_9b7b1b45_fk_video_playlist_id" FOREIGN KEY (playlist_id) REFERENCES video_playlist(id) DEFERRABLE INITIALLY DEFERRED
+
+ ============================================================================================================================================
+
+
+4.video_playlist_video 
+
+
+                                               Table "public.video_playlist_video"(Many To Many Relation between video and playlist)
+------------------------------------------------------------------------------------------------------------------------------------
+   Column    |  Type   |                             Modifiers                             | Storage | Stats target | Description 
+-------------+---------+-------------------------------------------------------------------+---------+--------------+-------------
+ id          | integer | not null default nextval('video_playlist_video_id_seq'::regclass) | plain   |              | 
+ playlist_id | uuid    | not null                                                          | plain   |              | 
+ video_id    | uuid    | not null                                                          | plain   |              | 
+Indexes:
+    "video_playlist_video_pkey" PRIMARY KEY, btree (id)
+    "video_playlist_video_playlist_id_video_id_045b9afb_uniq" UNIQUE CONSTRAINT, btree (playlist_id, video_id)
+    "video_playlist_video_playlist_id_9b7b1b45" btree (playlist_id)
+    "video_playlist_video_video_id_f2656b12" btree (video_id)
+Foreign-key constraints:
+    "video_playlist_video_playlist_id_9b7b1b45_fk_video_playlist_id" FOREIGN KEY (playlist_id) REFERENCES video_playlist(id) DEFERRABLE INITIALLY DEFERRED
+    "video_playlist_video_video_id_f2656b12_fk_video_video_id" FOREIGN KEY (video_id) REFERENCES video_video(id) DEFERRABLE INITIALLY DEFERRED
+
+============================================================================================================================================
+
+
+
+5. video_video_type
+
+
+                                                Table "public.video_video_type"(Many to Many Relation Between Video and Video Type)
+-------------------------------------------------------------------------------------------------------------------------------
+    Column    |  Type   |                           Modifiers                           | Storage | Stats target | Description 
+--------------+---------+---------------------------------------------------------------+---------+--------------+-------------
+ id           | integer | not null default nextval('video_video_type_id_seq'::regclass) | plain   |              | 
+ video_id     | uuid    | not null                                                      | plain   |              | 
+ videotype_id | integer | not null                                                      | plain   |              | 
+ percent      | integer |                                                               | plain   |              |
+Indexes:
+    "video_video_type_pkey" PRIMARY KEY, btree (id)
+    "video_video_type_video_id_videotype_id_63629752_uniq" UNIQUE CONSTRAINT, btree (video_id, videotype_id)
+    "video_video_type_video_id_22c72fdf" btree (video_id)
+    "video_video_type_videotype_id_89884700" btree (videotype_id)
+Foreign-key constraints:
+    "video_video_type_video_id_22c72fdf_fk_video_video_id" FOREIGN KEY (video_id) REFERENCES video_video(id) DEFERRABLE INITIALLY DEFERRED
+    "video_video_type_videotype_id_89884700_fk_video_videotype_id" FOREIGN KEY (videotype_id) REFERENCES video_videotype(id) DEFERRABLE INITIALLY DEFERRED
+
+
+==========================================================================================================================
+
+
+6.video_videotype
+
+
+                                                      Table "public.video_videotype"(Store The Video Category Like funny, romance, Drama etc)
+---------------------------------------------------------------------------------------------------------------------------------------------
+   Column   |         Type          |                          Modifiers                           | Storage  | Stats target | Description 
+------------+-----------------------+--------------------------------------------------------------+----------+--------------+-------------
+ id         | integer               | not null default nextval('video_videotype_id_seq'::regclass) | plain    |              | 
+ video_type | character varying(10) |                                                              | extended |              | 
+Indexes:
+    "video_videotype_pkey" PRIMARY KEY, btree (id)
+    "video_videotype_video_type_f0e81496" btree (video_type)
+    "video_videotype_video_type_f0e81496_like" btree (video_type varchar_pattern_ops)
+Referenced by:
+    TABLE "video_video_type" CONSTRAINT "video_video_type_videotype_id_89884700_fk_video_videotype_id" FOREIGN KEY (videotype_id) REFERENCES video_videotype(id) DEFERRABLE INITIALLY DEFERRED
+
+==============================================================================================================================================
+
+
+
+7.view_view
+
+                                                       Table "public.view_view"(For Every User watch A Video, Create An Entry)
+--------------------------------------------------------------------------------------------------------------------------------------------
+     Column      |           Type           |                       Modifiers                        | Storage | Stats target | Description 
+-----------------+--------------------------+--------------------------------------------------------+---------+--------------+-------------
+ id              | integer                  | not null default nextval('view_view_id_seq'::regclass) | plain   |              | 
+ play_on         | timestamp with time zone | not null                                               | plain   |              | 
+ total_play_time | integer                  | not null                                               | plain   |              | 
+ user_id         | uuid                     | not null                                               | plain   |              | 
+ video_id        | uuid                     | not null                                               | plain   |              | 
+Indexes:
+    "view_view_pkey" PRIMARY KEY, btree (id)
+    "view_view_user_id_02e716c6" btree (user_id)
+    "view_view_video_id_7bc9a696" btree (video_id)
+Check constraints:
+    "view_view_total_play_time_check" CHECK (total_play_time >= 0)
+Foreign-key constraints:
+    "view_view_user_id_02e716c6_fk_authentication_user_id" FOREIGN KEY (user_id) REFERENCES authentication_user(id) DEFERRABLE INITIALLY DEFERRED
+    "view_view_video_id_7bc9a696_fk_video_video_id" FOREIGN KEY (video_id) REFERENCES video_video(id) DEFERRABLE INITIALLY DEFERRED
+
+
+
+===============================================================================================================================================
+Recommended Video Query:-
+==============================================================================================================================================
+CREATE OR REPLACE FUNCTION recommended_video (user_id UUID) RETURNS UUID[] AS
+$BODY$
+DECLARE
+recommended_array UUID[]
+
+BEGIN
+	WITH last_100_video AS (
+		SELECT video_id, total_play_time FROM view_view WHERE user_id = $1 LIMIT 100
+	),
+	video_interest_cat_score AS (
+		SELECT category.id cat_id, AVG(top_v.total_play_time*v_type.percent/v.duration) as percent 
+ 		FROM video_videotype category
+		LEFT JOIN video_video_type v_type ON category.id = v_type.videotype_id
+		INNER JOIN last_100_video top_v  ON top_v.video_id = v_type.video_id
+		INNER JOIN video_video ON  v top_v.video_id = v.id
+		GROUP BY category.id
+		ORDER BY score DESC LIMIT 5
+	)
+	SELECT ARRAY(
+		SELECT v_type.video_id FROM video_video_type v_type
+		INNER JOIN video_interest_cat_score score ON score.cat_id = v_type.videotype_id
+		WHERE v_type.percent BETWEEN score.percent - 5 AND score.percent + 5;
+ 	) INTO recommended_array;
+	RETUEN recommended_array;
+
+END;	
+
+$BODY$
+LANGUAGE plpgsql IMMUTABLE
+COST 100;
+
+
+=============================================================================================================================================
+Trending Videos Query
+=============================================================================================================================================
+CREATE OR REPLACE FUNCTION trending_video () RETURNS UUID[] AS
+$BODY$
+DECLARE
+trending_array UUID[]
+
+BEGIN
+	WITH top_trending AS(
+		SELECT view.video_id video_id, avg(view.total_play_time/video.duration) score FROM view_view view
+		INNER JOIN video_video video ON video.id = view.video_id
+		WHERE view.play_on > current_timestamp - INTERVAL '1 day'
+		GROUP BY view.video_id ORDER BY score DESC LIMIT 10
+	)
+	SELECT ARRAY(
+		SELECT video_id FROM top_trending;
+ 	) INTO trending_array;
+	RETUEN trending_array;
+
+END;	
+
+$BODY$
+LANGUAGE plpgsql IMMUTABLE
+COST 100;
+===============================================================================================================================================
+===============================================================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                       Q2.  Design 2048 like game:
+                                                     ===============================
+
+
+
+
+
+
+
+
+
+
+import random
+
+
+class Game:
+    def __init__(self, array, key):
+        self.array = array
+        self.key = key
+        self.row, self.column = len(array), len(array[0])
+
+    @staticmethod
+    def create_random_number():
+        return random.choice([2, 4])
+
+    def collect_empty_place(self):
+        empty = []
+        for i in range(self.row):
+            for j in range(self.column):
+                if not self.array[i][j]:
+                    empty.append((i, j))
+        if not empty:
+            raise ValueError("You Lost The Game")
+        return random.choice(empty)
+
+    def set_value_random(self):
+        random_number = self.create_random_number()
+        empty_places = self.collect_empty_place()
+        self.array[empty_places[0]][empty_places[1]] = random_number
+
+    def shift_left(self):
+        if self.key == 1:
+            for i in range(self.row):
+                temp_j = -1
+                for j in range(self.column):
+                    if self.array[i][j]:
+                        if temp_j >= 0 and self.array[i][temp_j] == self.array[i][j]:
+                            self.array[i][temp_j] += self.array[i][j]
+                            self.array[i][j] = 0
+                        elif temp_j >= 0 and not self.array[i][temp_j]:
+                            self.array[i][temp_j], self.array[i][j] = self.array[i][j], self.array[i][temp_j]
+                            continue
+                        else:
+                            self.array[i][temp_j+1], self.array[i][j] = self.array[i][j], self.array[i][temp_j+1]
+                        temp_j += 1
+
+        else:
+            raise ValueError("Unexpected Key Enter")
+
+    def shift_right(self):
+        if self.key == 3:
+            for i in range(self.row):
+                temp_j = self.column
+                for j in range(self.column-1, -1, -1):
+                    if self.array[i][j]:
+                        if temp_j <= self.column - 1 and self.array[i][temp_j] == self.array[i][j]:
+                            self.array[i][temp_j] += self.array[i][j]
+                            self.array[i][j] = 0
+                        elif temp_j <= self.column - 1 and not self.array[i][temp_j]:
+                            self.array[i][temp_j], self.array[i][j] = self.array[i][j], self.array[i][temp_j]
+                            continue
+                        else:
+                            self.array[i][temp_j - 1], self.array[i][j] = self.array[i][j], self.array[i][temp_j - 1]
+                        temp_j -= 1
+        else:
+            raise ValueError("Unexpected Key Enter")
+
+    def shift_up(self):
+        if self.key == 2:
+            for i in range(self.column):
+                temp_i = -1
+                for j in range(self.row):
+                    if self.array[j][i]:
+                        if temp_i >= 0 and self.array[temp_i][i] == self.array[j][i]:
+                            self.array[temp_i][i] += self.array[j][i]
+                            self.array[j][i] = 0
+                        elif temp_i >= 0 and not self.array[temp_i][i]:
+                            self.array[temp_i][i], self.array[j][i] = self.array[j][i], self.array[temp_i][i]
+                            continue
+                        else:
+                            self.array[temp_i + 1][i], self.array[j][i] = self.array[j][i], self.array[temp_i + 1][i]
+                        temp_i += 1
+        else:
+            raise ValueError("Unexpected Key Enter")
+
+    def shift_down(self):
+        if self.key == 4:
+            for i in range(self.column):
+                temp_i = self.row
+                for j in range(self.row-1, -1, -1):
+                    if self.array[j][i]:
+                        if temp_i <= self.row - 1 and self.array[temp_i][i] == self.array[j][i]:
+                            self.array[temp_i][i] += self.array[j][i]
+                            self.array[j][i] = 0
+                        elif temp_i <= self.row - 1 and not self.array[temp_i][i]:
+                            self.array[temp_i][i], self.array[j][i] = self.array[j][i], self.array[temp_i][i]
+                            continue
+                        else:
+                            self.array[temp_i - 1][i], self.array[j][i] = self.array[j][i], self.array[temp_i - 1][i]
+                        temp_i -= 1
+        else:
+            raise ValueError("Unexpected Key Enter")
+
+    def __call__(self, *args, **kwargs):
+        if self.key == 1:
+            self.shift_left()
+        elif self.key == 2:
+            self.shift_up()
+        elif self.key == 3:
+            self.shift_right()
+        elif self.key == 4:
+            self.shift_down()
+	else:
+		print("Please Enter Proper Input")
+        self.set_value_random()
+
+
+n, m = 4, 6  # Size of game As n- Row m- Column
+loop = True
+array = [[0 for x in range(m)] for y in range(n)]
+while loop:
+    input_ = eval(input("Enter Number 1 For Left, 2 for Up, 3 for Right and 4 for Down And 0 For Exit"))
+    Game(array, input_).__call__()
+    for i in range(len(array)):
+        for j in range(len(array[0])):
+            print(array[i][j], end='          ')
+        print()
+    if input_ == 0:
+        loop = False
+
+
+================================================================================================================================================
+
+
+
+
+
+

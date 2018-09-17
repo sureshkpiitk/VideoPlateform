@@ -22,7 +22,7 @@ class Game:
         return random.choice(empty)
 
     def set_value_random(self):
-        random_number = self.create_random_number()
+        random_number = Game.create_random_number()
         empty_places = self.collect_empty_place()
         self.array[empty_places[0]][empty_places[1]] = random_number
 
